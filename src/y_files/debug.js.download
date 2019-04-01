@@ -1,0 +1,18 @@
+jQuery(document).ready(function(){
+	if(window.location.href.indexOf("#debug")!=-1)
+	{
+		var _lLog=function(str){
+			jQuery("#vtlai-debug-log pre").append(str+"<br><br>");
+		}
+		jQuery("body").append('<div id="vtlai-debug-log" style="position: fixed;bottom: 0;left: 0;width: 100%;max-height: 50%;height: auto;overflow: auto;"><pre></pre></div>');
+		console.log=function(str){
+			_lLog(str);
+		}
+		console.warn=function(str){
+			_lLog("Warn: "+str);
+		}
+		console.error=function(str){
+			_lLog("Error: "+str);
+		}
+	}
+});

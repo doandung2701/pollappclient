@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Link,
-    withRouter
-} from 'react-router-dom';
+    Link} from 'react-router-dom';
 import './AppHeader.css';
 import pollIcon from '../poll.svg';
 import { Layout, Menu, Dropdown, Icon } from 'antd';
@@ -10,19 +8,19 @@ const Header = Layout.Header;
     
 class AppHeader extends Component {
     constructor(props) {
-        super(props);   
+        super(props);                   
         this.handleMenuClick = this.handleMenuClick.bind(this);   
     }
-
     handleMenuClick({ key }) {
       if(key === "logout") {
         this.props.onLogout();
+        this.props.history.push("/");
       }
     }
 
-    render() {
+    render() {      
         let menuItems;
-        if(this.props.currentUser) {
+        if(this.props.login.currentUser!=null) {
           menuItems = [
             <Menu.Item key="/">
               <Link to="/">
@@ -36,7 +34,7 @@ class AppHeader extends Component {
           </Menu.Item>,
           <Menu.Item key="/profile" className="profile-menu">
                 <ProfileDropdownMenu 
-                  currentUser={this.props.currentUser} 
+                  currentUser={this.props.login.currentUser} 
                   handleMenuClick={this.handleMenuClick}/>
             </Menu.Item>
           ]; 
@@ -60,7 +58,7 @@ class AppHeader extends Component {
               <Menu
                 className="app-menu"
                 mode="horizontal"
-                selectedKeys={[this.props.location.pathname]}
+                selectedKeys={[this.props.history.location.pathname]}
                 style={{ lineHeight: '64px' }} >
                   {menuItems}
               </Menu>
@@ -104,4 +102,4 @@ function ProfileDropdownMenu(props) {
 }
 
 
-export default withRouter(AppHeader);
+export default AppHeader;

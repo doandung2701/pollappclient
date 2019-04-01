@@ -1,0 +1,10 @@
+try{
+    if(document.referrer.indexOf('baomoi.com') > -1) window.urlAntsPrebid = document.referrer;
+if("www.24h.com.vn"!=location.host){for(var getRandomInt=function(a,b){a=Math.ceil(a);b=Math.floor(b);return Math.floor(Math.random()*(b-a))+a},zoneNumber="undefined"!=typeof document.querySelectorAll?document.querySelectorAll("div[data-ants-zone-id]").length||document.querySelectorAll("div[data-oex-zone-id]").length:1,cates=[19886868001,19886868004,19886868005,19886868012,19886868016,19886868017,19886868023,19886868025,19886868033,19886868038,19886868041,19886868044,19886868047,19886868048,19886868056,
+19886868061,19886868062,19886868063,19886868064,19886868086,19886868096,19886868097,19886868100,19886868101,19886868103,19886868111,19886868112],i=0;i<zoneNumber;i++){var rand=Math.floor(Math.random()*cates.length),_comscore=_comscore||[];_comscore.push({c1:"8",c2:"24651731",c3:cates[rand]});_comscore.push({c1:"8",c2:"24651731",c3:cates[rand]});_comscore.push({c1:"8",c2:"24651731",c3:cates[rand]});_comscore.push({c1:"8",c2:"24651731",c3:cates[rand]});_comscore.push({c1:"8",c2:"24651731",c3:cates[rand]});
+_comscore.push({c1:"8",c2:"24651731",c3:cates[rand]});for(var cate_priority=[19886868001,19886868025,19886868033,19886868056,19886868100],j=0;j<cate_priority.length;j++)_comscore.push({c1:"8",c2:"24651731",c3:cate_priority[j]})}(function(){var a=document.createElement("script"),b=document.getElementsByTagName("script")[0];a.async=!0;a.src=("https:"==document.location.protocol?"https://sb":"http://b")+".scorecardresearch.com/beacon.js";b.parentNode.insertBefore(a,b)})();9==getRandomInt(1,10)&&function(){
+var a = document.createElement("iframe"); a.style.display = "none"; a.width = "0"; a.height = "0"; a.src = "//ants.rtb.adp3.net/users/sync"; document.body.appendChild(a);
+}()};
+}catch(ex){
+
+}

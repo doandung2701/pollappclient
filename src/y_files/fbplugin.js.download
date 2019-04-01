@@ -1,0 +1,87 @@
+jQuery(window).on('message',function(e){
+	//console.log(e.originalEvent.data);
+	var msg = e.originalEvent.data;
+	var msgReg=/^(fbPluginOpenSize|close)\:(.+)$/i;
+	if(typeof msg=="string" && msgReg.test(msg))
+	{
+		var msgParam=msgReg.exec(msg);
+		var msgAction=msgParam[1];
+		var msgData=jQuery.parseJSON(msgParam[2]);
+		if(msgData!=null && typeof msgData.selector=="string"){
+			//console.log(msgAction);
+			//console.log(msgData);
+			switch(msgAction){
+				case 'fbPluginOpenSize':
+					jQuery(msgData.selector).css({'height':msgData.height});
+					break;
+				case 'close':
+					jQuery(msgData.selector).remove();
+					break;
+			}
+		}
+	}
+});
+jQuery(document).ready(function(){
+	var _markOrder=0;
+	var _getElemAttr=function(obj,name,def){
+		if(typeof jQuery(obj).attr(name)!="undefined"){
+			return jQuery(obj).attr(name);
+		}
+		return def;
+	}
+	jQuery('.fb-like[data-href!=""]').each(function(){
+		console.log(this);
+		var dataHref=jQuery(this).attr('data-href');
+		var dataWith=jQuery(this).attr('data-width');
+		var iFrameId='fbplugin-like-'+_markOrder;
+		if(/^[0-9]+$/.test(dataWith))
+			dataWith+='px';
+		var iframeCode='<!DOCTYPE html>\
+<html>\
+<head>\
+	<title></title>\
+	<meta charset="utf-8">\
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">\
+	<meta name="robots" content="noindex, nofollow">\
+	<meta name="referrer" content="no-referrer-when-downgrade">\
+	<script type="text/javascript" src="/styles/vtlai/movie/js/jquery.js"></script>\
+	<script type="text/javascript">\
+		var postPluginInfo=function(){\
+			var messageStr="fbPluginOpenSize:"+JSON.stringify({"selector":"#'+iFrameId+'","height":jQuery("body").height()+"px"});\
+			window.top.postMessage(messageStr, "*");\
+			/* console.log(messageStr); */ \
+		}\r\n\
+		jQuery(window).load(function(){\
+			for(var i=1;i<200;i++){\
+				setTimeout(function(){postPluginInfo();},i*200);\
+			}\
+		});\
+	</script>\
+</head>\
+<body style="padding:0;margin:0;">\
+	<div class="fb-like like-at-rating" data-href="'+_getElemAttr(this,'data-href','')+'" data-width="'+_getElemAttr(this,'data-width','100%')+'" data-layout="'+_getElemAttr(this,'data-layout','standard')+'" data-action="'+_getElemAttr(this,'data-action','like')+'" data-show-faces="'+_getElemAttr(this,'data-show-faces','false')+'" data-share="'+_getElemAttr(this,'data-share','false')+'" data-colorscheme="'+_getElemAttr(this,'data-colorscheme','light')+'" colorscheme="'+_getElemAttr(this,'data-colorscheme','light')+'"></div>\
+	<div id="fb-root"></div>\
+	<script>(function(d, s, id) {\
+	  var js, fjs = d.getElementsByTagName(s)[0];\
+	  if (d.getElementById(id)) return;\
+	  js = d.createElement(s); js.id = id;\
+	  js.src = "https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v3.2";\
+	  fjs.parentNode.insertBefore(js, fjs);\
+	}(document, "script", "facebook-jssdk"));</script>\
+</body>\
+</html>';
+		
+		jQuery(this).html('<iframe id="'+iFrameId+'"  scrolling="no" frameborder="0" allowtransparency="true" style="border:0;margin:0;padding:0;overflow:hidden;display:block;width:'+dataWith+';height:0;"></iframe>');
+		jQuery(this).attr("fb-xfbml-state","rendered");
+		jQuery(this).attr("data-action","");
+		jQuery(this).attr("data-href","");
+		jQuery(this).removeClass("fb-like");
+		var ifObj=jQuery("iframe#"+iFrameId)[0];
+		var ifrm=(ifObj.contentWindow)?ifObj.contentWindow:(ifObj.contentDocument.document)?ifObj.contentDocument.document:ifObj.contentDocument;
+		ifrm.document.open();
+		ifrm.document.write(iframeCode);
+		ifrm.document.close();
+		
+		_markOrder++;
+	});
+});

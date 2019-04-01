@@ -1,108 +1,52 @@
 import React, { Component } from 'react';
-import { getAllPolls, getUserCreatedPolls, getUserVotedPolls } from '../util/APIUtils';
+import {Redirect } from 'react-router-dom'
 import Poll from './Poll';
 import { castVote } from '../util/APIUtils';
 import LoadingIndicator  from '../common/LoadingIndicator';
 import { Button, Icon, notification } from 'antd';
 import { POLL_LIST_SIZE } from '../constants';
-import { withRouter } from 'react-router-dom';
 import './PollList.css';
-
+import PollContainer from './PollContainer';
 class PollList extends Component {
     constructor(props) {
-        super(props);
-        this.state = {
-            polls: [],
-            page: 0,
-            size: 10,
-            totalElements: 0,
-            totalPages: 0,
-            last: true,
-            currentVotes: [],
-            isLoading: false
-        };
+        super(props);        
         this.loadPollList = this.loadPollList.bind(this);
-        this.handleLoadMore = this.handleLoadMore.bind(this);
+        this.handleLoadMore = this.handleLoadMore.bind(this);      
+        this.isChange=this.props.isAuthenticated;
     }
 
     loadPollList(page = 0, size = POLL_LIST_SIZE) {
-        let promise;
         if(this.props.username) {
+            let data={
+                username:this.props.username,
+                page:page,
+                size:size
+            }
             if(this.props.type === 'USER_CREATED_POLLS') {
-                promise = getUserCreatedPolls(this.props.username, page, size);
+                this.props.loadingUserCreatedPolls(data);
             } else if (this.props.type === 'USER_VOTED_POLLS') {
-                promise = getUserVotedPolls(this.props.username, page, size);                               
+                this.props.loadingUserVotedPolls(data);                               
             }
         } else {
-            promise = getAllPolls(page, size);
-        }
-
-        if(!promise) {
-            return;
-        }
-
-        this.setState({
-            isLoading: true
-        });
-
-        promise            
-        .then(response => {
-            const polls = this.state.polls.slice();
-            const currentVotes = this.state.currentVotes.slice();
-
-            this.setState({
-                polls: polls.concat(response.content),
-                page: response.page,
-                size: response.size,
-                totalElements: response.totalElements,
-                totalPages: response.totalPages,
-                last: response.last,
-                currentVotes: currentVotes.concat(Array(response.content.length).fill(null)),
-                isLoading: false
-            })
-        }).catch(error => {
-            this.setState({
-                isLoading: false
-            })
-        });  
+            this.props.loadingAllPolls({page, size});
+        } 
         
     }
 
     componentDidMount() {
         this.loadPollList();
     }
-
-    componentDidUpdate(nextProps) {
-        if(this.props.isAuthenticated !== nextProps.isAuthenticated) {
-            // Reset State
-            this.setState({
-                polls: [],
-                page: 0,
-                size: 10,
-                totalElements: 0,
-                totalPages: 0,
-                last: true,
-                currentVotes: [],
-                isLoading: false
-            });    
-            this.loadPollList();
-        }
-    }
-
+    
+    
     handleLoadMore() {
-        this.loadPollList(this.state.page + 1);
+        this.loadPollList(this.props.polls.page + 1);
     }
 
     handleVoteChange(event, pollIndex) {
-        const currentVotes = this.state.currentVotes.slice();
+        const currentVotes = this.props.polls.currentVotes.slice();
         currentVotes[pollIndex] = event.target.value;
-
-        this.setState({
-            currentVotes: currentVotes
-        });
+        this.props.VoteChange(currentVotes);
     }
-
-
     handleVoteSubmit(event, pollIndex) {
         event.preventDefault();
         if(!this.props.isAuthenticated) {
@@ -114,40 +58,32 @@ class PollList extends Component {
             return;
         }
 
-        const poll = this.state.polls[pollIndex];
-        const selectedChoice = this.state.currentVotes[pollIndex];
+        const poll = this.props.polls.polls[pollIndex];
+        const selectedChoice = this.props.polls.currentVotes[pollIndex];
 
         const voteData = {
             pollId: poll.id,
             choiceId: selectedChoice
         };
 
-        castVote(voteData)
-        .then(response => {
-            const polls = this.state.polls.slice();
-            polls[pollIndex] = response;
-            this.setState({
-                polls: polls
-            });        
-        }).catch(error => {
-            if(error.status === 401) {
-                this.props.handleLogout('/login', 'error', 'You have been logged out. Please login to vote');    
-            } else {
-                notification.error({
-                    message: 'Polling App',
-                    description: error.message || 'Sorry! Something went wrong. Please try again!'
-                });                
-            }
-        });
+        this.props.castVote(voteData,pollIndex);
+        
     }
 
     render() {
+        if(this.props.polls.isLogout==true){
+            return <Redirect
+            to={{
+            pathname: "/",
+            state: { from: this.props.location }
+        }}/>;
+        }
         const pollViews = [];
-        this.state.polls.forEach((poll, pollIndex) => {
-            pollViews.push(<Poll 
+        this.props.polls.polls.forEach((poll, pollIndex) => {
+            pollViews.push(<PollContainer
                 key={poll.id} 
                 poll={poll}
-                currentVote={this.state.currentVotes[pollIndex]} 
+                currentVote={this.props.polls.currentVotes[pollIndex]} 
                 handleVoteChange={(event) => this.handleVoteChange(event, pollIndex)}
                 handleVoteSubmit={(event) => this.handleVoteSubmit(event, pollIndex)} />)            
         });
@@ -156,14 +92,14 @@ class PollList extends Component {
             <div className="polls-container">
                 {pollViews}
                 {
-                    !this.state.isLoading && this.state.polls.length === 0 ? (
+                    !this.props.polls.isLoading && this.props.polls.polls.length === 0 ? (
                         <div className="no-polls-found">
                             <span>No Polls Found.</span>
                         </div>    
                     ): null
                 }  
                 {
-                    !this.state.isLoading && !this.state.last ? (
+                    !this.props.polls.isLoading && !this.props.polls.last ? (
                         <div className="load-more-polls"> 
                             <Button type="dashed" onClick={this.handleLoadMore} disabled={this.state.isLoading}>
                                 <Icon type="plus" /> Load more
@@ -171,7 +107,7 @@ class PollList extends Component {
                         </div>): null
                 }              
                 {
-                    this.state.isLoading ? 
+                    this.props.polls.isLoading ? 
                     <LoadingIndicator />: null                     
                 }
             </div>
@@ -179,4 +115,4 @@ class PollList extends Component {
     }
 }
 
-export default withRouter(PollList);
+export default PollList;

@@ -1,0 +1,19 @@
+if('2402:800:61b1:69df:8c80:ab80:fbe5:23d1'!=''){
+	CLIENT_IP='2402:800:61b1:69df:8c80:ab80:fbe5:23d1';
+}
+if(''!=''){
+	COUNTRY_CODE='';
+}else if('VN'!=''){
+	COUNTRY_CODE='VN';
+}
+
+try{
+	if(COUNTRY_CODE=="US" && typeof uniAd=="object"){
+		uniAd.headCodes=[];
+		uniAd.bodyCodes={};
+	}
+	jQuery(document).ready(function(){
+		jQuery("#client-ipaddress").attr("data-ip",CLIENT_IP);
+		jQuery("#client-ipaddress").text(CLIENT_IP);
+	});
+}catch(err){}

@@ -8,47 +8,22 @@ import LoadingIndicator  from '../../common/LoadingIndicator';
 import './Profile.css';
 import NotFound from '../../common/NotFound';
 import ServerError from '../../common/ServerError';
+import PollListContainer from '../../poll/PollListContainer';
 
 const TabPane = Tabs.TabPane;
 
 class Profile extends Component {
     constructor(props) {
-        super(props);
-        this.state = {
-            user: null,
-            isLoading: false
-        }
+        super(props);        
         this.loadUserProfile = this.loadUserProfile.bind(this);
     }
 
     loadUserProfile(username) {
-        this.setState({
-            isLoading: true
-        });
-
-        getUserProfile(username)
-        .then(response => {
-            this.setState({
-                user: response,
-                isLoading: false
-            });
-        }).catch(error => {
-            if(error.status === 404) {
-                this.setState({
-                    notFound: true,
-                    isLoading: false
-                });
-            } else {
-                this.setState({
-                    serverError: true,
-                    isLoading: false
-                });        
-            }
-        });        
+       this.props.loadUserProfile(username);
     }
       
     componentDidMount() {
-        const username = this.props.match.params.username;
+        const username = this.props.match.params.username;        
         this.loadUserProfile(username);
     }
 
@@ -58,16 +33,16 @@ class Profile extends Component {
         }        
     }
 
-    render() {
-        if(this.state.isLoading) {
+    render() {        
+        if(this.props.profile.isLoading) {
             return <LoadingIndicator />;
         }
 
-        if(this.state.notFound) {
+        if(this.props.profile.notFound) {
             return <NotFound />;
         }
 
-        if(this.state.serverError) {
+        if(this.props.profile.serverError) {
             return <ServerError />;
         }
 
@@ -78,19 +53,19 @@ class Profile extends Component {
         return (
             <div className="profile">
                 { 
-                    this.state.user ? (
+                    this.props.profile.user ? (
                         <div className="user-profile">
                             <div className="user-details">
                                 <div className="user-avatar">
-                                    <Avatar className="user-avatar-circle" style={{ backgroundColor: getAvatarColor(this.state.user.name)}}>
-                                        {this.state.user.name[0].toUpperCase()}
+                                    <Avatar className="user-avatar-circle" style={{ backgroundColor: getAvatarColor(this.props.profile.user.name)}}>
+                                        {this.props.profile.user.name[0].toUpperCase()}
                                     </Avatar>
                                 </div>
                                 <div className="user-summary">
-                                    <div className="full-name">{this.state.user.name}</div>
-                                    <div className="username">@{this.state.user.username}</div>
+                                    <div className="full-name">{this.props.profile.user.name}</div>
+                                    <div className="username">@{this.props.profile.user.username}</div>
                                     <div className="user-joined">
-                                        Joined {formatDate(this.state.user.joinedAt)}
+                                        Joined {formatDate(this.props.profile.user.joinedAt)}
                                     </div>
                                 </div>
                             </div>
@@ -100,11 +75,11 @@ class Profile extends Component {
                                     tabBarStyle={tabBarStyle}
                                     size="large"
                                     className="profile-tabs">
-                                    <TabPane tab={`${this.state.user.pollCount} Polls`} key="1">
-                                        <PollList username={this.props.match.params.username} type="USER_CREATED_POLLS" />
+                                    <TabPane tab={`${this.props.profile.user.pollCount} Polls`} key="1">
+                                        <PollListContainer username={this.props.match.params.username} type="USER_CREATED_POLLS" />
                                     </TabPane>
-                                    <TabPane tab={`${this.state.user.voteCount} Votes`}  key="2">
-                                        <PollList username={this.props.match.params.username} type="USER_VOTED_POLLS" />
+                                    <TabPane tab={`${this.props.profile.user.voteCount} Votes`}  key="2">
+                                        <PollListContainer username={this.props.match.params.username} type="USER_VOTED_POLLS" />
                                     </TabPane>
                                 </Tabs>
                             </div>  

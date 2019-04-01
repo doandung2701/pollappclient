@@ -1,0 +1,29 @@
+//AdsByBlueseed
+;var bshd1 = bshd1 || {}; 
+;bshd1['PUBLISHER_ID'] = bshd1['PUBLISHER_ID'] || 1034 ; 
+;bshd1['PLACEMENT_ID'] = bshd1['PLACEMENT_ID'] || 1497 ; 
+;bshd1['UUID'] = bshd1['UUID'] || '4ad670e19f6bc29bd57a5a46' ; 
+;bshd1['pmli'] = bshd1['pmli'] || {}; 
+;bshd1['LINEITEM_ID'] = bshd1['LINEITEM_ID'] || 2464 ; 
+;bshd1['ADFORMAT_ID'] = bshd1['ADFORMAT_ID'] || 0 ; 
+;bshd1['pmli']['1497']='2464';
+
+;(function () {
+  	var node = document.querySelector('#bsmasthead-wrapper');
+  	if(!node){document.write('<div id="bsmasthead-wrapper"></div>')}
+        
+    function loadAdScript(e,t){var s,a,c,r="adScript",n="Success ! Load "+r,o="Error ! Load "+r;if(document.getElementById(r)){if(t)try{var d=20,i=setInterval(function(){"undefined"!=typeof _adUtil&&(t({success:1,message:n}),clearInterval(i)),0===d&&(t({success:0,message:o}),clearInterval(i)),d--},300)}catch(e){t({success:0,message:o}),clearInterval(i)}}else a=!1,(s=document.createElement("script")).type="text/javascript",s.id=r,s.src=e,s.onload=s.onreadystatechange=function(){a||this.readyState&&"complete"!=this.readyState||(a=!0,t&&t({success:1,message:n}))},(c=document.getElementsByTagName("script")[0]).parentNode.insertBefore(s,c)};
+    
+  	loadAdScript('//static.blueseed.tv/ajs/ad-core/dist/adcore.js', function(e){
+        if(e.success){
+        	new ad_masthead({
+              placement: "#bsmasthead-wrapper",
+              placementId: '1497',
+              vastURL: ["//d4.blueseed.tv/vast3?li=2464&plm=1497&uuid=4ad670e19f6bc29bd57a5a46&t=1552235210170&url=http%3A%2F%2Fwww.phimmoi.net%2Fphim%2Fboruto-naruto-the-he-ke-tiep-i12-4997%2Fxem-phim.html"],
+              fallback: ``,
+              fallbackFunction: null,
+          })
+        }
+    });
+
+})();

@@ -1,0 +1,180 @@
+var ArrayAdBox=function(id,container,width,height){
+	var _adCodes=[];
+	var _boxId='';
+	var _container=null;
+	var _iframeForAll=1; //--If disable, first item no use iframe
+	var _currentIndex=0;
+	var _iframeObj=null;
+	var _adSize={'width':'100%','height':'100%'};
+	
+	var _increaseIndex=function(){
+		_currentIndex++;
+	}
+	
+	var _createIframe=function(bodyContent,headContent,width,height){
+		if(typeof bodyContent!="string")
+		var bodyContent='';
+		if(typeof headContent!="string")
+			var headContent='';
+		if(typeof width!="string")
+			var width='100%';
+		if(typeof height!="string")
+			var height='100%';
+		try{
+			_increaseIndex();
+			var html = '<!DOCTYPE html><html><head>\
+				'+headContent+'\
+				<script type="text/javascript">\
+				<!--\r\n\
+				if(typeof jQuery==\'undefined\')\r\n\
+					document.write(\'<script type="text/javascript" src="http://zone.uniad.vn/publisher/jquery-1.8.0.min.js"></script>\');\r\n\
+				\r\n-->\
+				</script>\r\n\
+				<script type="text/javascript">\
+				<!--\r\n\
+				var ArrayAdBox=window.parent.ArrayAdBox;\r\n\
+				var parentArrayAd=null;\r\n\
+				var adBoxId="'+_boxId+'";\r\n\
+				var currentIndex='+_currentIndex+';\r\n\
+				var _ArrayAdBoxs=[];\r\n\
+				try{\r\n\
+					if(typeof adBoxId!="undefined" && typeof window.parent._ArrayAdBoxs=="object"){\r\n\
+						_ArrayAdBoxs=window.parent._ArrayAdBoxs;\r\n\
+						parentArrayAd=_ArrayAdBoxs[adBoxId];\r\n\
+					}\r\n\
+				}catch(err){cosole.error(err);}\r\n\
+				jQuery(window).load(function(){\r\n\
+					//console.log("ArrayAdBox \\""+adBoxId+"\\" loaded Index "+currentIndex+":"+jQuery("body").html());\r\n\
+					console.log("ArrayAdBox \\""+adBoxId+"\\" loaded Index "+currentIndex);\r\n\
+					if(jQuery("body").height()<20){\r\n\
+						//window.parent.postMessage(currentAdDataJSON, "*");\r\n\
+						if(typeof parentArrayAd=="object" && parentArrayAd!=null){\r\n\
+							parentArrayAd.setContainer(jQuery("body")[0]);\r\n\
+							parentArrayAd.render();\r\n\
+						}\r\n\
+					}\r\n\
+				});\r\n\
+				jQuery(document).ready(function(){\r\n\
+					//console.log("Ready:"+jQuery("body").html());\r\n\
+					//console.log(window.location);\r\n\
+					//Nothing \r\n\
+				});\r\n\
+				\r\n-->\
+				</script>\
+				</head><body style="margin:0;padding:0">'+bodyContent+'</body></html>';
+				
+			var iframeObj = window.document.createElement('iframe');
+				
+			if(typeof iframeObj!="object" || !iframeObj)
+			{
+				console.error('ArrayAdBox Error => Can not create iframe object: '+err.message);
+				return false;
+			}
+			jQuery(_container).html('');
+			jQuery(_container).append(iframeObj);
+
+			jQuery(iframeObj).attr('style','border:0;padding:0;margin:0;width:'+width+';height:'+height);
+			jQuery(iframeObj).attr('scrolling','no');
+			jQuery(iframeObj).attr('id',"if-arrayadbox-"+_boxId);
+			
+			iframeObj.contentWindow.document.open();
+			iframeObj.contentWindow.document.write(html);
+			iframeObj.contentWindow.document.close();
+			if(width=='100%' && height=='100%')
+				jQuery(_container).css('overflow','hidden');
+			
+			return iframeObj;
+		}catch(err){
+			console.error('ArrayAdBox Error => Create iframe fail: '+err.message);
+			return false;
+		}
+	}
+	
+	if(typeof id!="undefined")
+	{
+		_boxId=id;
+	}
+	if(typeof container=="object")
+	{
+		_container=container;
+	}
+	
+	this.setContainer=function(container){
+		if(typeof container=="object")
+			_container=container;
+	}
+	
+	this.setSize=function(width,height){
+		if(typeof width!="undefined")
+			_adSize["width"]=width;
+		if(typeof height!="undefined")
+			_adSize["height"]=height;
+	}
+
+	
+	this.addCode=function(bodyCode,headCode){
+		var headCode=(typeof headCode=="string")?headCode:"";
+		var bodyCode=(typeof bodyCode=="string")?bodyCode:"";
+		_adCodes.push({'head':headCode,'body':bodyCode});
+	}
+	
+
+	
+	this.render=function(){
+		if(_adCodes.length>0)
+		{
+			var adItem=_adCodes.shift();
+			_createIframe(adItem.body,adItem.head,_adSize.width,_adSize.height);
+		}
+		else
+		{
+			//--Không có Ad, xóa Ad Iframe
+			var message=JSON.stringify({"arrayAdBox":true,"action":"closeAd","boxId":_boxId});
+			window.top.postMessage(message,"*");
+		}
+	}
+	
+	this.setSize(width,height);
+	if(typeof _ArrayAdBoxs=="undefined")
+		window._ArrayAdBoxs={};
+	_ArrayAdBoxs[_boxId]=this;
+}
+
+ArrayAdBox.openAd=function(id){
+	try{
+		jQuery("iframe#if-arrayadbox-"+id).slideDown("fast",function(){
+			console.log("ArrayAdBox Opened: "+id);
+		});
+		
+	}catch(err){}
+}
+
+ArrayAdBox.closeAd=function(id){
+	try{
+		jQuery("iframe#if-arrayadbox-"+id).remove();
+		console.log("ArrayAdBox Removed: "+id);
+	}catch(err){}
+}
+
+jQuery(window).on("message", function(e) {
+	try{
+		var message = e.originalEvent.data;
+		var data=jQuery.parseJSON(message);
+		//console.log(message);
+		//console.log(data);
+		if(typeof data=="object" && typeof data.arrayAdBox!="undefined")
+		{
+			var action=data.action;
+			var boxId=data.boxId;
+			switch(action)
+			{
+				case "openAd":
+					ArrayAdBox.openAd(boxId);
+					break;
+				case "closeAd":
+					ArrayAdBox.closeAd(boxId);
+					break;
+			}
+		}
+	}catch(err){}
+});

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './Poll.css';
-import { Avatar, Icon } from 'antd';
+import { Avatar, Icon, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import { getAvatarColor } from '../util/Colors';
 import { formatDateTime } from '../util/Helpers';
@@ -74,6 +74,7 @@ class Poll extends Component {
             })    
         }        
         return (
+            <Spin spinning={this.props.voteing==true}>
             <div className="poll-content">
                 <div className="poll-header">
                     <div className="poll-creator-info">
@@ -120,6 +121,7 @@ class Poll extends Component {
                     </span>
                 </div>
             </div>
+            </Spin>
         );
     }
 }

@@ -1,0 +1,91 @@
+/*
+Author:		Vũ Thanh Lai
+FB: 		Facebook.com/vuthanhlai
+Website:	PhimMoi.Net | SinhVienIT.Net | VuThanhLai.Com
+*/
+var FxRandom=function(){
+	var _itemIndex=0;
+	var _itemList={};
+	var _lastRangePoint=0;
+	var _lastError='';
+	
+	var _setLastError=function(str){
+		_lastError=str;
+	}
+	
+	var _getRangeByPercent=function(percent){
+		if(percent<=0)
+			return {"begin":0,"end":0};
+		var begin=_lastRangePoint+1;
+		var end=_lastRangePoint+percent*100000;
+		_lastRangePoint=end;
+		return {"begin":begin,"end":end};
+	}
+	
+	
+	this.getLastError=function(){
+		return _lastError;
+	}
+	
+	this.totalPercent=function(){
+		var total=0;
+		for(var i in _itemList)
+		{
+			total+=_itemList[i];
+		}
+		return total;
+	}
+	
+	this.addItem=function(item,percent){
+		if(typeof item=="undefined")
+		{
+			_setLastError("Item phải là 1 biến có giá trị xác định.");
+			return false;
+		}
+		if(typeof percent!="number" || percent<0 || percent>100)
+		{
+			_setLastError("Percent (Tỷ lệ lấy được item) phải là 1 số >=0 và <=100 (%)");
+			return false;
+		}
+		var itemId="item"+_itemIndex;
+		_itemIndex++;
+		_itemList[itemId]={"id":itemId,"percent":percent,"range":_getRangeByPercent(percent),"data":item}
+		return itemId;
+	}
+	
+	this.getItemById=function(itemId){
+		if(typeof _itemList[itemId]!="undefined")
+			return _itemList[itemId].data;
+		return false;
+	}
+	
+	this.getAllItem=function(){
+		return _itemList; 
+	}
+	this.getLastRangePoint=function(){
+		return _lastRangePoint;
+	}
+	this.getRandomItem=function(){
+		var randValue=Math.random()*_lastRangePoint;
+		//console.log("randValue:"+randValue);
+		for(var itemId in _itemList)
+		{
+			var item=_itemList[itemId];
+			if(item.range.begin<=randValue && randValue<=item.range.end)
+				return item.data;
+		}
+		return false;
+	}
+	this.test=function(){
+		var result={};
+		for(var i=1;i<=100;i++)
+		{
+			var r=this.getRandomItem();
+			if(typeof result[r]!="undefined")
+				result[r]++;
+			else
+				result[r]=1;
+		}
+		console.log(result);
+	}
+}

@@ -1,0 +1,29 @@
+//--Code by: Vu Thanh Lai - SinhVienIT.Net
+//--www.facebook.com/vuthanhlai
+
+if(typeof _preventCache=="undefined")
+	var _preventCache='1.0000088886';
+
+var _getScriptPath=function(str){
+	var jsElemt=document.querySelector('script[src*="'+str+'"]');
+	if(typeof jsElemt=="object" && jsElemt!=null){
+		return jsElemt.src.substr(0,jsElemt.src.indexOf(str));
+	}
+	return '';
+}
+var _playerSetup={};
+var _playerScriptPath=_getScriptPath('player.js');
+if(typeof jQuery == "undefined"){
+	document.write('<script type="text/javascript" src="'+_playerScriptPath+'tools/jquery-1.12.4.min.js?v='+_preventCache+'"></script>');
+}
+
+if(typeof FlashDetect == "undefined"){
+	document.write('<script type="text/javascript" src="'+_playerScriptPath+'tools/flashdetect.min.js?v='+_preventCache+'"></script>');
+}
+
+if(typeof device == "undefined"){
+	document.write('<script type="text/javascript" src="'+_playerScriptPath+'tools/device.js?v='+_preventCache+'"></script>');
+}
+document.write('<script type="text/javascript" src="'+_playerScriptPath+'jw/jwplayer.js?v='+_preventCache+'"></script>');
+document.write('<link type="text/css" rel="stylesheet" href="'+_playerScriptPath+'css/vtlai.css?v='+_preventCache+'"/>');
+document.write('<script type="text/javascript" src="'+_playerScriptPath+'init.js?v='+_preventCache+'"></script>');

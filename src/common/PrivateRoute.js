@@ -3,6 +3,14 @@ import {
     Route,
     Redirect
   } from "react-router-dom";
+  import { connect } from "react-redux";
+ const mapStateToProps = (state) => ({
+  authenticated:state.loginReducer.authenticated
+ })
+ 
+ const mapDispatchToProps =dispatch=> {
+   
+ }
   
   
 const PrivateRoute = ({ component: Component, authenticated, ...rest }) => (
@@ -23,4 +31,4 @@ const PrivateRoute = ({ component: Component, authenticated, ...rest }) => (
     />
 );
   
-export default PrivateRoute
+export default connect(mapStateToProps,mapDispatchToProps)(PrivateRoute);

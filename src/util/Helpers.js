@@ -1,3 +1,5 @@
+import {createBrowserHistory} from 'history';
+export var history = createBrowserHistory({});
 export function formatDate(dateString) {
     const date = new Date(dateString);
 

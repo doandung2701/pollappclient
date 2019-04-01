@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { createPoll } from '../util/APIUtils';
 import { MAX_CHOICES, POLL_QUESTION_MAX_LENGTH, POLL_CHOICE_MAX_LENGTH } from '../constants';
 import './NewPoll.css';  
-import { Form, Input, Button, Icon, Select, Col, notification } from 'antd';
+import { Form, Input, Button, Icon, Select, Col, notification, Spin } from 'antd';
+import {Redirect } from 'react-router-dom'
+
 const Option = Select.Option;
 const FormItem = Form.Item;
 const { TextArea } = Input
@@ -60,19 +62,8 @@ class NewPoll extends Component {
             pollLength: this.state.pollLength
         };
 
-        createPoll(pollData)
-        .then(response => {
-            this.props.history.push("/");
-        }).catch(error => {
-            if(error.status === 401) {
-                this.props.handleLogout('/login', 'error', 'You have been logged out. Please login create poll.');    
-            } else {
-                notification.error({
-                    message: 'Polling App',
-                    description: error.message || 'Sorry! Something went wrong. Please try again!'
-                });              
-            }
-        });
+        this.props.createPoll(pollData)
+        
     }
 
     validateQuestion = (questionText) => {
@@ -170,8 +161,15 @@ class NewPoll extends Component {
         this.state.choices.forEach((choice, index) => {
             choiceViews.push(<PollChoice key={index} choice={choice} choiceNumber={index} removeChoice={this.removeChoice} handleChoiceChange={this.handleChoiceChange}/>);
         });
-
+        if(this.props.newPoll.success){
+            return <Redirect
+            to={{
+            pathname: "/",
+            state: { from: this.props.location }
+        }}/>;   
+        }
         return (
+            <Spin spinning={this.props.newPoll.isloading==true}>
             <div className="new-poll-container">
                 <h1 className="page-title">Create Poll</h1>
                 <div className="new-poll-content">
@@ -237,6 +235,7 @@ class NewPoll extends Component {
                     </Form>
                 </div>    
             </div>
+            </Spin>
         );
     }
 }

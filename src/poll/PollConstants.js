@@ -1,0 +1,9 @@
+export const LOADING = "LOADING_POLL_LIST";
+export const LOAD_ERROR="LOAD_ERROR";
+export const LOAD_POLLS_SUCCESS="LOAD_SUCCESS";
+export const VOTE_CHANGE="VOTE_CHANGE";
+export const BEGINNING_SUBMIT="BEGINNING_SUBMIT";
+export const ERROR="ERROR";
+export const VOTE_SUBMIT_SUCCESS="VOTE_SUBMIT_SUCCESS";
+export const LOGOUTED="LOGOUTED";
+export const RESET="RESET";
