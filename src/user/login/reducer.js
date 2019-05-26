@@ -19,6 +19,7 @@ export const loginReducer=(state=initialState,action)=>{
          notification.success({
             message: 'Polling App',
             description: 'Login successfully. Waiting to load your profile',
+            
         });
          return {
              ...state,loading:false,
@@ -45,7 +46,8 @@ export const loginReducer=(state=initialState,action)=>{
          return {
              ...state,
              loading:false,
-             currentUser:action.payload
+             currentUser:action.payload,
+             authenticated:true
          } 
          case ERRORBASE:
          if(localStorage.getItem(ACCESS_TOKEN)){
@@ -58,7 +60,9 @@ export const loginReducer=(state=initialState,action)=>{
          return {
              ...state,
              loading:false,
-            error:true
+            error:true,
+            authenticated:false
+
          }
          case LOG_OUT:
          notification.success({

@@ -4,6 +4,7 @@ import { MAX_CHOICES, POLL_QUESTION_MAX_LENGTH, POLL_CHOICE_MAX_LENGTH } from '.
 import './NewPoll.css';  
 import { Form, Input, Button, Icon, Select, Col, notification, Spin } from 'antd';
 import {Redirect } from 'react-router-dom'
+import { history } from '../util/Helpers';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -35,7 +36,13 @@ class NewPoll extends Component {
         this.handlePollHoursChange = this.handlePollHoursChange.bind(this);
         this.isFormInvalid = this.isFormInvalid.bind(this);
     }
-
+ 
+        componentDidUpdate(prevProps, prevState) {
+            let {success} = this.props.newPoll;
+            if(success === true){
+                history.push("/");
+            }
+        }
     addChoice(event) {
         const choices = this.state.choices.slice();        
         this.setState({
@@ -161,13 +168,6 @@ class NewPoll extends Component {
         this.state.choices.forEach((choice, index) => {
             choiceViews.push(<PollChoice key={index} choice={choice} choiceNumber={index} removeChoice={this.removeChoice} handleChoiceChange={this.handleChoiceChange}/>);
         });
-        if(this.props.newPoll.success){
-            return <Redirect
-            to={{
-            pathname: "/",
-            state: { from: this.props.location }
-        }}/>;   
-        }
         return (
             <Spin spinning={this.props.newPoll.isloading==true}>
             <div className="new-poll-container">

@@ -23,11 +23,6 @@ const { Content } = Layout;
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      currentUser: null,
-      isAuthenticated: false,
-      isLoading: false
-    }
     notification.config({
       placement: 'topRight',
       top: 70,
@@ -60,7 +55,7 @@ class App extends Component {
                 <Route path="/users/:username" 
                   render={(props) => <ProfileContainer  {...props}  />}>
                 </Route>
-                <PrivateRoute  path="/poll/new" component={NewPollContainer} ></PrivateRoute>
+                <PrivateRoute path="/poll/new" component={NewPollContainer}/>
                 <Route component={NotFound}></Route>
               </Switch>
             </div>

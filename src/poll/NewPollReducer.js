@@ -1,5 +1,6 @@
 import { LOADING_CREATE, CREATE_SUCCESS, CREATE_ERROR } from "./NewPollsConstants";
 import { notification } from "antd";
+import { history } from "../util/Helpers";
 
 var initialState={
     isLoading:false,
@@ -33,6 +34,7 @@ export const newPollReducer=(state=initialState,action)=>{
                 ...state,
                 isLoading:false,
                 error:true,
+                success:false
             }
         }
      
